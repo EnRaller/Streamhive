@@ -1,0 +1,31 @@
+.header {
+  overflow: hidden;
+  background-color: #b3b1b1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header a {
+  color: black;
+  text-align: center;
+  padding: 12px;
+  text-decoration: none;
+  font-size: 18px;
+  line-height: 25px;
+  border-radius: 4px;
+}
+.header img {
+    height: 100px;
+}
+body {
+  background-color: grey;
+}
+.tekstmidden {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+} 
+h1 {
+  font-size: 50px;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}

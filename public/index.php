@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Streamhive</title>
-    <link rel="stylesheet" href="../CSS/style.css?1">
+    <link rel="stylesheet" href="style.css?1">
 </head>
 <body>
 
@@ -14,25 +14,30 @@
             <img src="../IMG/Streamhive.png" alt="Streamhive Logo">
         </a>
         <div class="header-right">
-            <a href="admin.php">Adminpagina</a>
+            <a href="login.php">Loginpagina</a>
         </div>
     </div>
 
     <!-- Code voor de tekst in t midden-->
     <div class="tekstmidden">
-        <h1>Welkom bij hotel Evernight</h1>
+        <h1>Welkom bij Streamhive!</h1>
     </div>
 
+<?php
+require 'pdo.php';
+
+$stmt = $pdo->query("SELECT title FROM videos");
+
+while ($row = $stmt->fetch()) {
+    echo $row['title'] . "<br>";
+}
+?>
 
 </select>
 
 
 </form>
 </div>
-
-<a href="formulier.php">
-    <button>Nieuw formulier</button>
-</a>
 
 </body>
 </html>
