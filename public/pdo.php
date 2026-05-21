@@ -1,6 +1,6 @@
 <?php
 
-$host = "localhost";
+$host = "127.0.0.1";
 $db   = "streamhive";
 $user = "root";
 $pass = "";
@@ -16,7 +16,7 @@ $options = [
 
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (\PDOException $e) {
+} catch (PDOException $e) {
     die("Database fout: " . $e->getMessage());
 }
 ?>
