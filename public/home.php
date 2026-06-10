@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+// login check
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: index.php");
     exit;
@@ -8,16 +8,35 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 require 'pdo.php';
 
-$stmt = $pdo->query("
-SELECT videos.*, users.username, users.icon
-FROM videos
-JOIN users ON videos.user_id = users.ID
-ORDER BY videos.id DESC
-");
+$search = $_GET['search'] ?? '';
+// checkt of er wordt gesearched
+if ($search !== '') {
+    $stmt = $pdo->prepare("
+        SELECT videos.*, users.username, users.icon
+        FROM videos
+        JOIN users ON videos.user_id = users.ID
+        WHERE videos.title LIKE ?
+        ORDER BY videos.id DESC
+    ");
+    $stmt->execute(["%$search%"]);
+} else {
+    $stmt = $pdo->query("
+        SELECT videos.*, users.username, users.icon
+        FROM videos
+        JOIN users ON videos.user_id = users.ID
+        ORDER BY videos.id DESC
+    ");
+}
 
 $videos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$icon = $_SESSION['account_icon'] ?? 'default.png';
+$user_id = $_SESSION['user_id'];
+// haalt profielfotos op
+$stmtUser = $pdo->prepare("SELECT icon FROM users WHERE ID = ?");
+$stmtUser->execute([$user_id]);
+$user = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+$icon = $user['icon'] ?? 'default.png';
 ?>
 
 <!DOCTYPE html>
@@ -36,6 +55,11 @@ $icon = $_SESSION['account_icon'] ?? 'default.png';
 
     <div class="header-right">
 
+        <form method="GET" style="display:flex; gap:10px;">
+            <input type="text" name="search" placeholder="Search..." value="<?= htmlspecialchars($search) ?>">
+            <button class="btn" type="submit">Search</button>
+        </form>
+
         <a class="btn" href="upload.php">Upload</a>
 
         <img src="uploads/<?= htmlspecialchars($icon) ?>" class="avatar-big">
@@ -49,25 +73,25 @@ $icon = $_SESSION['account_icon'] ?? 'default.png';
 <div class="feed">
 
 <?php foreach ($videos as $video): ?>
-
+<!-- Hier wordt de video preview data dingen geladen -->
 <div class="video-card">
 
-<a href="watch.php?id=<?= $video['id'] ?>">
-<img class="thumbnail" src="uploads/thumbnails/<?= htmlspecialchars($video['thumbnail']) ?>">
-</a>
+    <a href="watch.php?id=<?= $video['id'] ?>">
+        <img class="thumbnail" src="uploads/thumbnails/<?= htmlspecialchars($video['thumbnail']) ?>">
+    </a>
 
-<div class="video-info">
+    <div class="video-info">
 
-<img class="avatar" src="uploads/<?= htmlspecialchars($video['icon'] ?? 'default.png') ?>">
+        <img class="avatar" src="uploads/<?= htmlspecialchars($video['icon'] ?? 'default.png') ?>">
 
-<div class="meta">
-<h3><?= htmlspecialchars($video['title']) ?></h3>
-<p>
-<?= htmlspecialchars($video['username']) ?> • <?= $video['views'] ?> views
-</p>
-</div>
+        <div class="meta">
+            <h3><?= htmlspecialchars($video['title']) ?></h3>
+            <p>
+                <?= htmlspecialchars($video['username']) ?> • <?= $video['views'] ?> views
+            </p>
+        </div>
 
-</div>
+    </div>
 
 </div>
 

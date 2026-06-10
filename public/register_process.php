@@ -33,7 +33,7 @@ if (!empty($_FILES['icon']['name'])) {
 }
 
 $stmt = $pdo->prepare("
-INSERT INTO accounts (email, username, password, role, created_at, icon)
+INSERT INTO users (email, username, password, role, created_at, icon)
 VALUES (?, ?, ?, ?, ?, ?)
 ");
 
