@@ -1,79 +1,69 @@
 <?php
 session_start();
-// login check
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+require 'pdo.php';
+require '../app/models/classes/Video.php';
+require '../app/models/classes/User.php';
+
+if (!isset($_SESSION['loggedin'])) {
     header("Location: index.php");
     exit;
 }
 
-require 'pdo.php';
+$videoModel = new Video($pdo);
+$userModel = new User($pdo);
 
 $search = $_GET['search'] ?? '';
-// checkt of er wordt gesearched
-if ($search !== '') {
-    $stmt = $pdo->prepare("
+
+$videos = $search !== ''
+    ? $pdo->prepare("
         SELECT videos.*, users.username, users.icon
         FROM videos
         JOIN users ON videos.user_id = users.ID
         WHERE videos.title LIKE ?
         ORDER BY videos.id DESC
-    ");
-    $stmt->execute(["%$search%"]);
+    ")
+    : null;
+
+if ($videos) {
+    $videos->execute(["%$search%"]);
+    $videos = $videos->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $stmt = $pdo->query("
-        SELECT videos.*, users.username, users.icon
-        FROM videos
-        JOIN users ON videos.user_id = users.ID
-        ORDER BY videos.id DESC
-    ");
+    $videos = $videoModel->getAll();
 }
 
-$videos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$user_id = $_SESSION['user_id'];
-// haalt profielfotos op
-$stmtUser = $pdo->prepare("SELECT icon FROM users WHERE ID = ?");
-$stmtUser->execute([$user_id]);
-$user = $stmtUser->fetch(PDO::FETCH_ASSOC);
-
+$user = $userModel->getById($_SESSION['user_id']);
 $icon = $user['icon'] ?? 'default.png';
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
+<link rel="stylesheet" href="style.css?v=3">
 <title>Home</title>
-<link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 
 <div class="header">
-
-    <div class="header-left">
-        StreamHive
-    </div>
+    <div class="header-left">StreamHive</div>
 
     <div class="header-right">
-
-        <form method="GET" style="display:flex; gap:10px;">
-            <input type="text" name="search" placeholder="Search..." value="<?= htmlspecialchars($search) ?>">
-            <button class="btn" type="submit">Search</button>
+        <form method="GET" style="display:flex;gap:10px;">
+            <input type="text" name="search" value="<?= htmlspecialchars($search) ?>">
+            <button class="btn">Search</button>
         </form>
 
         <a class="btn" href="upload.php">Upload</a>
 
-        <img src="uploads/<?= htmlspecialchars($icon) ?>" class="avatar-big">
+        <img class="avatar-big" src="uploads/<?= htmlspecialchars($icon) ?>">
 
         <a class="logout" href="logout.php">Logout</a>
-
     </div>
-
 </div>
 
 <div class="feed">
 
 <?php foreach ($videos as $video): ?>
-<!-- Hier wordt de video preview data dingen geladen -->
+
 <div class="video-card">
 
     <a href="watch.php?id=<?= $video['id'] ?>">
@@ -86,9 +76,7 @@ $icon = $user['icon'] ?? 'default.png';
 
         <div class="meta">
             <h3><?= htmlspecialchars($video['title']) ?></h3>
-            <p>
-                <?= htmlspecialchars($video['username']) ?> • <?= $video['views'] ?> views
-            </p>
+            <p><?= htmlspecialchars($video['username']) ?> • <?= $video['views'] ?> views</p>
         </div>
 
     </div>

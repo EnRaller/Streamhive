@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'pdo.php';
+require '../app/models/classes/Comment.php';
 
 if (!isset($_SESSION['loggedin'])) {
     header("Location: index.php");
@@ -11,23 +12,13 @@ $user_id = $_SESSION['user_id'];
 $video_id = $_POST['video_id'];
 $content = trim($_POST['content']);
 
-if ($content == "") {
+if ($content === '') {
     header("Location: watch.php?id=" . $video_id);
     exit;
 }
 
-$stmt = $pdo->prepare("
-INSERT INTO comments (user_id, video_id, content, created_at)
-VALUES (?, ?, ?, ?)
-");
-
-$stmt->execute([
-    $user_id,
-    $video_id,
-    $content,
-    date('Y-m-d')
-]);
+$commentModel = new Comment($pdo);
+$commentModel->create($user_id, $video_id, $content);
 
 header("Location: watch.php?id=" . $video_id);
 exit;
-?>
