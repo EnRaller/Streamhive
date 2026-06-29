@@ -19,7 +19,10 @@ $video_name = time() . "_" . $_FILES['video']['name'];
 $thumbnail_name = time() . "_" . $_FILES['thumbnail']['name'];
 
 move_uploaded_file($_FILES['video']['tmp_name'], "uploads/videos/" . $video_name);
-move_uploaded_file($_FILES['thumbnail']['tmp_name'], "uploads/" . $thumbnail_name);
+move_uploaded_file(
+    $_FILES['thumbnail']['tmp_name'],
+    "uploads/thumbnails/" . $thumbnail_name
+);
 
 $videoModel = new Video($pdo);
 
