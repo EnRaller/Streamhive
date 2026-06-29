@@ -210,3 +210,56 @@ padding:12px;
 border-radius:12px;
 box-shadow:0 4px 10px rgba(0,0,0,.06);
 }
+
+.watch-layout{
+    display:flex;
+    justify-content:center;
+    padding:30px;
+}
+
+.watch-main{
+    width:100%;
+    max-width:900px;
+}
+
+.video-player{
+    width:100%;
+    border-radius:14px;
+    background:black;
+}
+
+.video-title{
+    margin-top:15px;
+    font-size:28px;
+}
+
+.categories{
+    margin:10px 0;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.tag{
+    background:#e9eef6;
+    padding:5px 10px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.comment-body{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+}
+
+.btn.small{
+    padding:6px 10px;
+    font-size:12px;
+}
+
+.description{
+    margin-top:15px;
+    line-height:1.5;
+}

@@ -10,8 +10,8 @@ if (!isset($_SESSION['loggedin'])) {
 <!DOCTYPE html>
 <html>
 <head>
-<title>Upload</title>
-<link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css">
+    <title>Upload Video</title>
 </head>
 <body>
 
@@ -19,39 +19,60 @@ if (!isset($_SESSION['loggedin'])) {
     <div class="header-left">StreamHive</div>
     <div class="header-right">
         <a class="btn" href="home.php">Home</a>
-        <a class="logout" href="logout.php">Logout</a>
     </div>
 </div>
 
-<div class="form">
-    <h1>Upload video</h1>
+<div class="container">
 
-    <form action="upload_process.php" method="POST" enctype="multipart/form-data">
+<form action="upload_process.php" method="POST" enctype="multipart/form-data">
 
-        <label class="form-label">Title</label>
-        <input class="form-input" name="title" required>
+    <label class="form-label">Title</label>
+    <input class="form-input" name="title" required>
 
-        <label class="form-label">Description</label>
-        <input class="form-input" name="description" required>
+    <label class="form-label">Description</label>
+    <input class="form-input" name="description" required>
 
-        <label class="form-label">Category</label>
-        <select class="form-input" name="category_id">
-            <option value="1">Gaming</option>
-            <option value="2">Cooking</option>
-            <option value="3">Sport</option>
-            <option value="4">Beauty</option>
-            <option value="5">Science</option>
-        </select>
+    <label class="form-label">Categories</label>
 
-        <label class="form-label">Video</label>
-        <input class="form-input" type="file" name="video" accept="video/mp4" required>
+    <div class="category-box">
 
-        <label class="form-label">Thumbnail</label>
-        <input class="form-input" type="file" name="thumbnail" accept="image/*" required>
+        <label>
+            <input type="checkbox" name="category_id[]" value="1">
+            Gaming
+        </label>
 
-        <button class="btn" type="submit">Upload</button>
+        <label>
+            <input type="checkbox" name="category_id[]" value="2">
+            Cooking
+        </label>
 
-    </form>
+        <label>
+            <input type="checkbox" name="category_id[]" value="3">
+            Sport
+        </label>
+
+        <label>
+            <input type="checkbox" name="category_id[]" value="4">
+            Beauty
+        </label>
+
+        <label>
+            <input type="checkbox" name="category_id[]" value="5">
+            Science
+        </label>
+
+    </div>
+
+    <label class="form-label">Video</label>
+    <input class="form-input" type="file" name="video" accept="video/mp4" required>
+
+    <label class="form-label">Thumbnail</label>
+    <input class="form-input" type="file" name="thumbnail" accept="image/*" required>
+
+    <button class="btn" type="submit">Upload</button>
+
+</form>
+
 </div>
 
 </body>

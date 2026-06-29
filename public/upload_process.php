@@ -1,48 +1,36 @@
 <?php
-session_start();
 
+session_start();
 require 'pdo.php';
 require '../app/models/classes/Video.php';
 
-if (!isset($_SESSION['loggedin'])) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit;
 }
 
-$videoModel = new Video($pdo);
-
 $user_id = $_SESSION['user_id'];
+
 $title = $_POST['title'];
 $description = $_POST['description'];
-$category_id = $_POST['category_id'];
+$category_ids = $_POST['category_id'];
 
-$videoFile = "none";
-$thumbFile = "default.png";
+$video_name = time() . "_" . $_FILES['video']['name'];
+$thumbnail_name = time() . "_" . $_FILES['thumbnail']['name'];
 
-if (isset($_FILES['video']) && $_FILES['video']['error'] === 0) {
+move_uploaded_file($_FILES['video']['tmp_name'], "uploads/videos/" . $video_name);
+move_uploaded_file($_FILES['thumbnail']['tmp_name'], "uploads/" . $thumbnail_name);
 
-    $ext = strtolower(pathinfo($_FILES['video']['name'], PATHINFO_EXTENSION));
+$videoModel = new Video($pdo);
 
-    if ($ext !== "mp4") {
-        die("Only mp4 allowed");
-    }
-
-    $videoFile = time() . "_" . preg_replace("/[^a-zA-Z0-9._-]/", "_", $_FILES['video']['name']);
-    move_uploaded_file($_FILES['video']['tmp_name'], "uploads/videos/" . $videoFile);
-}
-
-if (isset($_FILES['thumbnail']) && $_FILES['thumbnail']['error'] === 0) {
-
-    $ext = strtolower(pathinfo($_FILES['thumbnail']['name'], PATHINFO_EXTENSION));
-
-    if (in_array($ext, ["jpg", "jpeg", "png"])) {
-
-        $thumbFile = time() . "_thumb_" . preg_replace("/[^a-zA-Z0-9._-]/", "_", $_FILES['thumbnail']['name']);
-        move_uploaded_file($_FILES['thumbnail']['tmp_name'], "uploads/thumbnails/" . $thumbFile);
-    }
-}
-
-$videoModel->create($user_id, $title, $description, $videoFile, $thumbFile, $category_id);
+$videoModel->create(
+    $user_id,
+    $title,
+    $description,
+    $video_name,
+    $thumbnail_name,
+    $category_ids
+);
 
 header("Location: home.php");
 exit;

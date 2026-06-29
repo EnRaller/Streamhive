@@ -24,24 +24,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['like_video'])) {
         $likeModel->toggleVideoLike($user_id, $id);
-        header("Location: watch.php?id=" . $id);
+        header("Location: watch.php?id=$id");
         exit;
     }
 
     if (isset($_POST['like_comment'])) {
         $likeModel->toggleCommentLike($user_id, $_POST['comment_id']);
-        header("Location: watch.php?id=" . $id);
+        header("Location: watch.php?id=$id");
         exit;
     }
 
     if (isset($_POST['comment_submit'])) {
         $content = trim($_POST['content']);
-
         if ($content !== '') {
             $commentModel->create($user_id, $id, $content);
         }
-
-        header("Location: watch.php?id=" . $id);
+        header("Location: watch.php?id=$id");
         exit;
     }
 }
@@ -49,13 +47,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $video = $videoModel->getById($id);
 $comments = $commentModel->getByVideo($id);
 $videoLikes = $likeModel->countVideoLikes($id);
+$categories = $videoModel->getCategoriesByVideo($id);
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="style.css">
-<title><?= htmlspecialchars($video['title']) ?></title>
+    <link rel="stylesheet" href="style.css">
+    <title><?= htmlspecialchars($video['title']) ?></title>
 </head>
 <body>
 
@@ -66,61 +65,71 @@ $videoLikes = $likeModel->countVideoLikes($id);
     </div>
 </div>
 
-<div class="watch-container">
+<div class="watch-layout">
 
-<video width="900" controls autoplay>
-    <source src="uploads/videos/<?= htmlspecialchars($video['filename']) ?>">
-</video>
+    <div class="watch-main">
 
-<h1><?= htmlspecialchars($video['title']) ?></h1>
+        <video class="video-player" controls autoplay>
+            <source src="uploads/videos/<?= htmlspecialchars($video['filename']) ?>">
+        </video>
 
-<div class="watch-meta">
-    <img class="avatar-big" src="uploads/<?= htmlspecialchars($video['icon'] ?? 'default.png') ?>">
-    <div>
-        <h3><?= htmlspecialchars($video['username']) ?></h3>
-        <p><?= $video['views'] ?> views</p>
-    </div>
-</div>
+        <h1 class="video-title"><?= htmlspecialchars($video['title']) ?></h1>
 
-<form method="POST">
-    <button class="btn" name="like_video">Like <?= $videoLikes ?></button>
-</form>
+        <div class="watch-meta">
+            <img class="avatar-big" src="uploads/<?= htmlspecialchars($video['icon'] ?? 'default.png') ?>">
+            <div>
+                <h3><?= htmlspecialchars($video['username']) ?></h3>
+                <p><?= $video['views'] ?> views</p>
+            </div>
+        </div>
 
-<p class="description">
-    <?= htmlspecialchars($video['description']) ?>
-</p>
-
-<form method="POST">
-    <textarea name="content" required></textarea>
-    <button class="btn" name="comment_submit">Comment</button>
-</form>
-
-<div class="comments">
-
-<?php foreach ($comments as $comment): ?>
-
-<?php $likes = $likeModel->countCommentLikes($comment['comment_id']); ?>
-
-<div class="comment">
-
-    <img class="avatar" src="uploads/<?= htmlspecialchars($comment['icon'] ?? 'default.png') ?>">
-
-    <div>
-        <b><?= htmlspecialchars($comment['username']) ?></b>
-        <p><?= htmlspecialchars($comment['content']) ?></p>
+        <div class="categories">
+            <?php foreach ($categories as $cat): ?>
+                <span class="tag"><?= htmlspecialchars($cat['name']) ?></span>
+            <?php endforeach; ?>
+        </div>
 
         <form method="POST">
-            <input type="hidden" name="comment_id" value="<?= $comment['comment_id'] ?>">
-            <button class="btn" name="like_comment">Like <?= $likes ?></button>
+            <button class="btn" name="like_video">Like <?= $videoLikes ?></button>
         </form>
 
+        <p class="description">
+            <?= htmlspecialchars($video['description']) ?>
+        </p>
+
+        <form class="comment-form" method="POST">
+            <textarea name="content" required></textarea>
+            <button class="btn" name="comment_submit">Comment</button>
+        </form>
+
+        <div class="comments">
+
+            <?php foreach ($comments as $comment): ?>
+
+                <?php $likes = $likeModel->countCommentLikes($comment['comment_id']); ?>
+
+                <div class="comment">
+
+                    <img class="avatar"
+                         src="uploads/<?= htmlspecialchars($comment['icon'] ?? 'default.png') ?>">
+
+                    <div class="comment-body">
+                        <b><?= htmlspecialchars($comment['username']) ?></b>
+                        <p><?= htmlspecialchars($comment['content']) ?></p>
+
+                        <form method="POST">
+                            <input type="hidden" name="comment_id" value="<?= $comment['comment_id'] ?>">
+                            <button class="btn small" name="like_comment">Like <?= $likes ?></button>
+                        </form>
+                    </div>
+
+                </div>
+
+            <?php endforeach; ?>
+
+        </div>
+
     </div>
-
-</div>
-
-<?php endforeach; ?>
-
-</div>
 
 </div>
 
